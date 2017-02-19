@@ -3,7 +3,12 @@ FROM jimschubert/8-jdk-alpine-mvn:1.0
 ENV GEN_DIR /opt/swagger-codegen
 
 RUN set -x && \
-    apk add --no-cache bash
+    apk add --update \
+    bash \
+    curl \
+    git \
+    jq \
+    && rm -rf /var/cache/apk/*
 
 RUN mkdir /opt
 
