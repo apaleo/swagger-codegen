@@ -1,5 +1,5 @@
 {{>licenseInfo}}
-import { Inject, Injectable, Optional }                      from '@angular/core';
+import { Inject, Injectable, Optional, LOCALE_ID }           from '@angular/core';
 import { Http, Headers, URLSearchParams }                    from '@angular/http';
 import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
 import { Response, ResponseContentType }                     from '@angular/http';
@@ -22,17 +22,15 @@ import { Configuration }                                     from '../../configu
 {{/description}}
 @Injectable()
 export class {{classname}} {
-    protected basePath = '{{{basePath}}}';
     public defaultHeaders: Headers = new Headers();
-    public configuration: Configuration = new Configuration();
 
-    constructor(protected http: Http, @Optional()@Inject(BASE_PATH) basePath: string, @Optional() configuration: Configuration) {
-        if (basePath) {
-            this.basePath = basePath;
-        }
-        if (configuration) {
-            this.configuration = configuration;
-        }
+    constructor(
+        protected readonly http: Http, 
+        protected readonly configuration: Configuration,
+        @Inject(LOCALE_ID) protected readonly locale: string, 
+        @Inject(BASE_PATH) protected readonly basePath: string) {
+
+        this.defaultHeaders.append('Accept-Language', locale);
     }
 
 {{#operation}}
@@ -92,8 +90,8 @@ export class {{classname}} {
         {{/isListContainer}}
         {{^isListContainer}}
         if ({{paramName}} !== undefined) {
-            if({{paramName}} instanceof Date) {
-                queryParameters.set('{{baseName}}', <any>{{paramName}}.d.toISOString());
+            if(<any>{{paramName}} instanceof Date) {
+                queryParameters.set('{{baseName}}', (<Date><any>{{paramName}}).toISOString());
             } else {
                 queryParameters.set('{{baseName}}', <any>{{paramName}});
             }

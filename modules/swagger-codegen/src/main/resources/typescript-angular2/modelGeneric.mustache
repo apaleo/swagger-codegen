@@ -1,3 +1,6 @@
+import { Validators } from '@angular/forms';
+import { ValidatorsFactory, ControlFactory, Control } from '../../types';
+
 export interface {{classname}} {{#parent}}extends models.{{{parent}}} {{/parent}}{
 {{#additionalPropertiesType}}
     [key: string]: {{{additionalPropertiesType}}}{{#hasVars}} | any{{/hasVars}};
@@ -26,3 +29,41 @@ export namespace {{classname}} {
     {{/isEnum}}
 {{/vars}}
 }{{/hasEnums}}
+
+export interface {{classname}}$Form<T> {
+{{#vars}}
+    {{name}}: T;
+{{/vars}}
+}
+
+export interface {{classname}}$ValidatorFactories extends {{classname}}$Form<ValidatorsFactory> {}
+export interface {{classname}}$ControlFactories extends {{classname}}$Form<ControlFactory> {}
+export interface {{classname}}$FormBuiler extends {{classname}}$Form<Control> {}
+
+const $validators: {{classname}}$ValidatorFactories = {
+{{#vars}}
+    {{name}}: (() => [
+        {{#required}}Validators.required,{{/required}}
+        {{#minLength}}Validators.minLength({{minLength}}),{{/minLength}}
+        {{#maxLength}}Validators.maxLength({{maxLength}}),{{/maxLength}}
+    ]),
+{{/vars}}
+}
+
+const $controls: {{classname}}$ControlFactories = {
+{{#vars}}
+    {{name}}: (() => [null, Validators.compose($validators.{{name}}())]),
+{{/vars}}
+}
+
+export const {{classname}} = {
+    $validators: $validators,
+    $controls: $controls,
+    $formGroup: (() => {
+        return {
+{{#vars}}
+            {{name}}: $controls.{{name}}(),
+{{/vars}}
+        };
+    }) as (() => {{classname}}$FormBuiler),
+}
