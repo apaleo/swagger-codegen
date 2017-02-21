@@ -38,7 +38,12 @@ export interface {{classname}}$Form<T> {
 
 export interface {{classname}}$ValidatorFactories extends {{classname}}$Form<ValidatorsFactory> {}
 export interface {{classname}}$ControlFactories extends {{classname}}$Form<ControlFactory> {}
-export interface {{classname}}$FormBuiler extends {{classname}}$Form<Control> {}
+
+export interface {{classname}}$FormBuiler {
+{{#vars}}
+    {{name}}: {{#isPrimitiveType}}Control{{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}$FormBuilder{{/isPrimitiveType}};
+{{/vars}}    
+}
 
 const $validators: {{classname}}$ValidatorFactories = {
 {{#vars}}
