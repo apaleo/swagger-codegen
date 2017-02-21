@@ -62,7 +62,7 @@ export const {{classname}} = {
     $formGroup: (() => {
         return {
 {{#vars}}
-            {{name}}: $controls.{{name}}(),
+            {{name}}: {{#isPrimitiveType}}$controls.{{name}}(){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$formGroup(){{/isPrimitiveType}},
 {{/vars}}
         };
     }) as (() => {{classname}}$FormBuiler),
