@@ -39,7 +39,7 @@ export interface {{classname}}$Form<T> {
 export interface {{classname}}$ValidatorFactories extends {{classname}}$Form<ValidatorsFactory> {}
 export interface {{classname}}$ControlFactories extends {{classname}}$Form<ControlFactory> {}
 
-export interface {{classname}}$FormBuiler {
+export interface {{classname}}$FormBuilder {
 {{#vars}}
     {{name}}: {{#isPrimitiveType}}Control{{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}$FormBuilder{{/isPrimitiveType}};
 {{/vars}}    
@@ -70,5 +70,5 @@ export const {{classname}} = {
             {{name}}: {{#isPrimitiveType}}$controls.{{name}}(){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$formGroup(){{/isPrimitiveType}},
 {{/vars}}
         };
-    }) as (() => {{classname}}$FormBuiler),
+    }) as (() => {{classname}}$FormBuilder),
 }
