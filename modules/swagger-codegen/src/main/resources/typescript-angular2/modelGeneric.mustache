@@ -1,4 +1,4 @@
-import { Validators } from '@angular/forms';
+import { Validators, FormBuilder } from '@angular/forms';
 import { ValidatorsFactory, ControlFactory, Control } from '../../types';
 
 export interface {{classname}} {{#parent}}extends models.{{{parent}}} {{/parent}}{
@@ -39,12 +39,6 @@ export interface {{classname}}$Form<T> {
 export interface {{classname}}$ValidatorFactories extends {{classname}}$Form<ValidatorsFactory> {}
 export interface {{classname}}$ControlFactories extends {{classname}}$Form<ControlFactory> {}
 
-export interface {{classname}}$FormBuilder {
-{{#vars}}
-    {{name}}: {{#isPrimitiveType}}Control{{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}$FormBuilder{{/isPrimitiveType}};
-{{/vars}}    
-}
-
 const $validators: {{classname}}$ValidatorFactories = {
 {{#vars}}
     {{name}}: (() => [
@@ -64,11 +58,11 @@ const $controls: {{classname}}$ControlFactories = {
 export const {{classname}} = {
     $validators: $validators,
     $controls: $controls,
-    $formGroup: (() => {
+    $buildForm: ((fb: FormBuilder) => {
         return {
 {{#vars}}
-            {{name}}: {{#isPrimitiveType}}$controls.{{name}}(){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$formGroup(){{/isPrimitiveType}},
+            {{name}}: {{#isPrimitiveType}}$controls.{{name}}(){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},
 {{/vars}}
         };
-    }) as (() => {{classname}}$FormBuilder),
+    }),
 }
