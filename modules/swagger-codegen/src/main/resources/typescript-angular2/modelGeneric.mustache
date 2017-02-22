@@ -58,11 +58,10 @@ const $controls: {{classname}}$ControlFactories = {
 export const {{classname}} = {
     $validators: $validators,
     $controls: $controls,
-    $buildForm: ((fb: FormBuilder) => {
-        return {
+    $buildForm: ((fb: FormBuilder) =>
+        fb.group({
 {{#vars}}
             {{name}}: {{#isPrimitiveType}}$controls.{{name}}(){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},
 {{/vars}}
-        };
-    }),
+        })),
 }
