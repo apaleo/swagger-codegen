@@ -61,7 +61,9 @@ export const {{classname}} = {
     $buildForm: ((fb: FormBuilder) =>
         fb.group({
 {{#vars}}
+    {{^isListContainer}}
             {{name}}: {{#isPrimitiveType}}$controls.{{name}}(){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},
+    {{/isListContainer}} 
 {{/vars}}
         })),
 }
