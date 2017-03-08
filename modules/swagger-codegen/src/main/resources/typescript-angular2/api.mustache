@@ -46,11 +46,19 @@ export class {{classname}} {
     public {{nickname}}({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}, {{/allParams}}extraHttpRequestParams?: any, retryTimes?: number): Observable<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}{}{{/returnType}}> {
         return this.{{nickname}}WithHttpInfo({{#allParams}}{{paramName}}, {{/allParams}}extraHttpRequestParams)
             .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json();
-                }
+                let contentType: string | null = response.headers.get('content-type');
+
+                if (contentType) {
+                    contentType = contentType.toLowerCase().trim();
+
+                    if (contentType.indexOf('application/json') !== -1 || contentType.indexOf('text/json') !== -1) {
+                        if (response.text()) {
+                            return response.json();
+                        }
+                    }
+                } 
+                // else
+                return undefined;
             });
     }
 
