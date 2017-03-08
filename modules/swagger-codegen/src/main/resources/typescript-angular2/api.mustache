@@ -63,8 +63,9 @@ export class {{classname}} {
      * {{notes}}
      {{#allParams}}* @param {{paramName}} {{description}}
      {{/allParams}}*/
-    private {{nickname}}WithHttpInfo({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}, {{/allParams}}extraHttpRequestParams?: any, retryTimes?: number): Observable<Response> {
-        const path = this.basePath + `{{path}}`;
+    public {{nickname}}WithHttpInfo({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}, {{/allParams}}extraHttpRequestParams?: any, retryTimes?: number): Observable<Response> {
+        const path = this.basePath + '{{path}}'{{#pathParams}}
+                    .replace('${' + '{{baseName}}' + '}', String({{paramName}})){{/pathParams}};
 
         if (retryTimes === undefined) {
             retryTimes = this.configuration.retryPolicy.defaultRetryTimes;
@@ -99,11 +100,17 @@ export class {{classname}} {
         {{/isListContainer}}
         {{^isListContainer}}
         if ({{paramName}} !== undefined) {
-            if(<any>{{paramName}} instanceof Date) {
-                queryParameters.set('{{baseName}}', (<Date><any>{{paramName}}).toISOString());
-            } else {
-                queryParameters.set('{{baseName}}', <any>{{paramName}});
-            }
+            {{#isDateTime}}
+                queryParameters.set('{{baseName}}', <any>{{paramName}}.toISOString());
+            {{/isDateTime}}
+            {{^isDateTime}}
+                {{#isDate}}
+                    queryParameters.set('{{baseName}}', <any>{{paramName}}.toISOString());
+                {{/isDate}}
+                {{^isDate}}
+                    queryParameters.set('{{baseName}}', <any>{{paramName}});
+                {{/isDate}}
+            {{/isDateTime}}
         }
         {{/isListContainer}}
 
