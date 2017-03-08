@@ -5,10 +5,9 @@ import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http
 import { Response, ResponseContentType }                     from '@angular/http';
 
 import { Observable }                                        from 'rxjs/Observable';
-import * as Rx                                               from 'rxjs/rx';
+import * as Rx                                               from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/flatMap';
-import 'rxjs/add/operator/of';
+import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/catch';
 
@@ -63,13 +62,14 @@ export class {{classname}} {
      * {{notes}}
      {{#allParams}}* @param {{paramName}} {{description}}
      {{/allParams}}*/
-    public {{nickname}}WithHttpInfo({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}, {{/allParams}}extraHttpRequestParams?: any, retryTimes?: number): Observable<Response> {
+    private {{nickname}}WithHttpInfo({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}, {{/allParams}}extraHttpRequestParams?: any, retryTimes?: number): Observable<Response> {
         const path = this.basePath + '{{path}}'{{#pathParams}}
                     .replace('${' + '{{baseName}}' + '}', String({{paramName}})){{/pathParams}};
 
         if (retryTimes === undefined) {
             retryTimes = this.configuration.retryPolicy.defaultRetryTimes;
         }
+        const localRetryTimes = retryTimes;
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
@@ -221,9 +221,9 @@ export class {{classname}} {
 
         return this.http.request(path, requestOptions).catch(err => {
             if (err instanceof Response) {
-                if (this.configuration.retryPolicy.shouldRetry(err.status) && retryTimes > 0) {
-                    return Rx.Observable.of(0).delay(delay).flatMap(() =>
-                        this.{{nickname}}WithHttpInfo({{#allParams}}{{paramName}}, {{/allParams}}extraHttpRequestParams, (retryTimes - 1));
+                if (this.configuration.retryPolicy.shouldRetryOnStatusCode(err.status) && localRetryTimes > 0) {
+                    return Rx.Observable.of(0).delay(this.configuration.retryPolicy.delayInMs).mergeMap(() =>
+                        this.{{nickname}}WithHttpInfo({{#allParams}}{{paramName}}, {{/allParams}}extraHttpRequestParams, (localRetryTimes - 1)));
                 }
             }
             throw err;
