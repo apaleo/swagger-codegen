@@ -76,12 +76,6 @@ export class {{classname}} {
         const path = this.basePath + '{{path}}'{{#pathParams}}
                     .replace('${' + '{{baseName}}' + '}', String({{paramName}})){{/pathParams}};
 
-        let retryTimes = this.configuration.retryPolicy.defaultRetryTimes;
-
-        if ($options && $options.retryTimes !== undefined) {
-            retryTimes = $options.retryTimes;
-        } 
-
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
 {{#hasFormParams}}
@@ -213,7 +207,46 @@ export class {{classname}} {
         {{/isListContainer}}
 
 {{/formParams}}
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
+        let retryTimes = this.configuration.retryPolicy.defaultRetryTimes;
+        let isResponseCodeAllowed: (code: number) => boolean = () => false;
+        let requestOptionsInterceptor = (r: RequestOptionsArgs) => (new RequestOptions(r)) as RequestOptionsArgs;
+
+        if ($options) {
+            if ($options.retryTimes !== undefined) {
+                retryTimes = $options.retryTimes;
+            }
+            
+            if ($options.allowResponseCodes) {
+                if (typeof $options.allowResponseCodes === 'function') {
+                    isResponseCodeAllowed = $options.allowResponseCodes;
+                } else {
+                    const allowedResponseCodes = $options.allowResponseCodes;
+                    isResponseCodeAllowed = code => allowedResponseCodes.indexOf(code) !== -1;
+                }
+            }
+            
+            if ($options.ifMatch && $options.ifNoneMatch) {
+                throw Error('You cannot specify ifMatch AND ifNoneMatch on one request.')
+            } else if ($options.ifMatch) {
+                headers.set('If-Match', $options.ifMatch);
+            } else if ($options.ifNoneMatch) {
+                headers.set('If-None-Match', $options.ifNoneMatch);
+            }
+
+            if ($options.additionalHeaders) {
+                for (const key in $options.additionalHeaders) {
+                    if ($options.additionalHeaders.hasOwnProperty(key)) {
+                        headers.set(key, $options.additionalHeaders[key]);
+                    }
+                }
+            }
+
+            if ($options.customInterceptor) {
+                requestOptionsInterceptor = $options.customInterceptor;
+            }
+        }
+
+        let requestOptions: RequestOptionsArgs = requestOptionsInterceptor({
             method: {{httpMethod}},
             headers: headers,
 {{#bodyParam}}
@@ -227,18 +260,9 @@ export class {{classname}} {
 
         return this.http.request(path, requestOptions).catch(err => {
             if (err instanceof Response) {
-                if ($options && $options.allowResponseCodes) {
-                    if (typeof $options.allowResponseCodes === 'function') {
-                        if ($options.allowResponseCodes(err.status)) {
-                            return Rx.Observable.of(err);
-                        }
-                    } else {
-                        if ($options.allowResponseCodes.indexOf(err.status) !== -1) {
-                            return Rx.Observable.of(err);
-                        }
-                    }
-                }
-                if (this.configuration.retryPolicy.shouldRetryOnStatusCode(err.status) && retryTimes > 0) {
+                if (isResponseCodeAllowed(err.status)) {
+                    return Rx.Observable.of(err);
+                } else if (this.configuration.retryPolicy.shouldRetryOnStatusCode(err.status) && retryTimes > 0) {
                     $options = $options || {};
                     $options.retryTimes = retryTimes - 1;
 
