@@ -1,6 +1,6 @@
-import { Validators, FormBuilder, ValidatorFn, FormGroup } from '@angular/forms';
-import { ValidatorsFactory, ControlFactory, Control }      from '../../types';
-import { ResponseModel }                                   from '../../models';
+import { Validators, FormBuilder, ValidatorFn, FormGroup }                      from '@angular/forms';
+import { ValidatorsFactory, ControlFactory, Control, IApaleoAbstractControl }   from '../../types';
+import { ResponseModel }                                                        from '../../models';
 
 export interface {{classname}} {{#parent}}extends models.{{{parent}}} {{/parent}}{
 {{#additionalPropertiesType}}
@@ -61,12 +61,22 @@ const $controls: {{classname}}$ControlFactories = {
 export const {{classname}} = {
     $validators: $validators,
     $controls: $controls,
-    $buildForm: ((fb: FormBuilder) =>
-        fb.group({
+    $buildForm: ((fb: FormBuilder) => {
+        const group = fb.group({
 {{#vars}}
     {{^isListContainer}}
             {{name}}: {{#isPrimitiveType}}$controls.{{name}}(){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},
     {{/isListContainer}} 
 {{/vars}}
-        })),
+        });
+
+{{#vars}}
+    {{^isListContainer}}{{#isPrimitiveType}}{{#maxLength}}
+        const {{name}}Ctrl: IApaleoAbstractControl = <any>group.controls['{{name}}'];
+        {{name}}Ctrl.apaleoMetaData = { maxLength: {{maxLength}} };
+    {{/maxLength}}{{/isPrimitiveType}}{{/isListContainer}}
+{{/vars}}
+
+        return group;
+    })
 }
