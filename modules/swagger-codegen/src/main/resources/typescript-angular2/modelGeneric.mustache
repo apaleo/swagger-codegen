@@ -1,6 +1,7 @@
-import { Validators, FormBuilder, ValidatorFn, FormGroup }                      from '@angular/forms';
-import { ValidatorsFactory, ControlFactory, Control, IApaleoAbstractControl }   from '../../types';
-import { ResponseModel }                                                        from '../../models';
+import { Validators, FormBuilder, ValidatorFn, FormGroup }          from '@angular/forms';
+import { ValidatorsFactory, ControlFactory, Control }               from '../../types';
+import { IApaleoAbstractControl, IApaleoControlMetaData, Optional } from '../../types';
+import { ResponseModel }                                            from '../../models';
 
 export interface {{classname}} {{#parent}}extends models.{{{parent}}} {{/parent}}{
 {{#additionalPropertiesType}}
@@ -41,6 +42,8 @@ export interface {{classname}}$Form<T> {
 
 export interface {{classname}}$ValidatorFactories extends {{classname}}$Form<ValidatorsFactory> {}
 export interface {{classname}}$ControlFactories extends {{classname}}$Form<ControlFactory> {}
+export interface {{classname}}$Control extends {{classname}}$Form<Control | FormGroup> {}
+export interface {{classname}}$ControlMetaData extends {{classname}}$Form<IApaleoControlMetaData> {}
 
 const $validators: {{classname}}$ValidatorFactories = {
 {{#vars}}
@@ -58,23 +61,37 @@ const $controls: {{classname}}$ControlFactories = {
 {{/vars}}
 }
 
+const $metaData: {{classname}}$ControlMetaData = {
+{{#vars}}
+    {{name}}: {
+        {{^isListContainer}}{{#isPrimitiveType}}
+        {{#maxLength}}maxLength: {{maxLength}},{{/maxLength}}
+        {{^isEnum}}type: '{{datatype}}',{{/isEnum}}
+        {{/isPrimitiveType}}{{/isListContainer}}
+    },
+{{/vars}}
+}
+
 export const {{classname}} = {
     $validators: $validators,
     $controls: $controls,
-    $buildForm: ((fb: FormBuilder) => {
-        const group = fb.group({
+    $metaData: $metaData,
+    $buildForm: ((fb: FormBuilder, specificControls?: Optional<{{classname}}$Control>, additionalControls?: { [name: string]: (Control | FormGroup) }) => {
+        const defaultControls = {
 {{#vars}}
     {{^isListContainer}}
             {{name}}: {{#isPrimitiveType}}$controls.{{name}}(){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},
     {{/isListContainer}} 
 {{/vars}}
-        });
+        };
+
+        const group = fb.group(Object.assign(defaultControls, specificControls, additionalControls));
 
 {{#vars}}
-    {{^isListContainer}}{{#isPrimitiveType}}{{#maxLength}}
+    {{^isListContainer}}{{#isPrimitiveType}}
         const {{name}}Ctrl: IApaleoAbstractControl = <any>group.controls['{{name}}'];
-        {{name}}Ctrl.apaleoMetaData = { maxLength: {{maxLength}} };
-    {{/maxLength}}{{/isPrimitiveType}}{{/isListContainer}}
+        {{name}}Ctrl.apaleoMetaData = $metaData.{{name}};
+    {{/isPrimitiveType}}{{/isListContainer}}
 {{/vars}}
 
         return group;
