@@ -43,7 +43,7 @@ export interface {{classname}}$Form<T> {
 export interface {{classname}}$ValidatorFactories extends {{classname}}$Form<ValidatorsFactory> {}
 export interface {{classname}}$ControlFactories extends {{classname}}$Form<ControlFactory> {}
 export interface {{classname}}$Control extends {{classname}}$Form<Control | FormGroup> {}
-export interface {{classname}}$ControlMetaData extends {{classname}}$Form<Control | FormGroup> {}
+export interface {{classname}}$ControlMetaData extends {{classname}}$Form<IApaleoControlMetaData> {}
 
 const $validators: {{classname}}$ValidatorFactories = {
 {{#vars}}
@@ -66,7 +66,7 @@ const $metaData: {{classname}}$ControlMetaData = {
     {{name}}: {
         {{^isListContainer}}{{#isPrimitiveType}}
         {{#maxLength}}maxLength: {{maxLength}},{{/maxLength}}
-        {{^isEnum}}type: {{datatype}},{{/isEnum}}
+        {{^isEnum}}type: '{{datatype}}',{{/isEnum}}
         {{/isPrimitiveType}}{{/isListContainer}}
     },
 {{/vars}}
@@ -76,8 +76,8 @@ export const {{classname}} = {
     $validators: $validators,
     $controls: $controls,
     $metaData: $metaData,
-    $buildForm: ((fb: FormBuilder, specificControls: Optional<{{classname}}$Control>, additionalControls: { [name: string]: (Control | FormGroup) }) => {
-        const defaultControls: {{classname}}$Control = {
+    $buildForm: ((fb: FormBuilder, specificControls?: Optional<{{classname}}$Control>, additionalControls?: { [name: string]: (Control | FormGroup) }) => {
+        const defaultControls = {
 {{#vars}}
     {{^isListContainer}}
             {{name}}: {{#isPrimitiveType}}$controls.{{name}}(){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},
