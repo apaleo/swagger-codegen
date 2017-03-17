@@ -45,38 +45,35 @@ export interface {{classname}}$ControlFactories extends {{classname}}$Form<Contr
 export interface {{classname}}$Control extends {{classname}}$Form<Control | FormGroup> {}
 export interface {{classname}}$ControlMetaData extends {{classname}}$Form<IApaleoControlMetaData> {}
 
-const $validators: {{classname}}$ValidatorFactories = {
-{{#vars}}
-    {{name}}: (() => [
-        {{#required}}Validators.required,{{/required}}
-        {{#minLength}}Validators.minLength({{minLength}}),{{/minLength}}
-        {{#maxLength}}Validators.maxLength({{maxLength}}),{{/maxLength}}
-    ]),
-{{/vars}}
-}
+export namespace {{classname}} {
+    export const $validators: {{classname}}$ValidatorFactories = {
+    {{#vars}}
+        {{name}}: (() => [
+            {{#required}}Validators.required,{{/required}}
+            {{#minLength}}Validators.minLength({{minLength}}),{{/minLength}}
+            {{#maxLength}}Validators.maxLength({{maxLength}}),{{/maxLength}}
+        ]),
+    {{/vars}}
+    };
 
-const $controls: {{classname}}$ControlFactories = {
-{{#vars}}
-    {{name}}: (() => [null, Validators.compose($validators.{{name}}())]),
-{{/vars}}
-}
+    export const $controls: {{classname}}$ControlFactories = {
+    {{#vars}}
+        {{name}}: (() => [null, Validators.compose($validators.{{name}}())]),
+    {{/vars}}
+    };
 
-const $metaData: {{classname}}$ControlMetaData = {
-{{#vars}}
-    {{name}}: {
-        {{^isListContainer}}{{#isPrimitiveType}}
-        {{#maxLength}}maxLength: {{maxLength}},{{/maxLength}}
-        {{^isEnum}}type: '{{datatype}}',{{/isEnum}}
-        {{/isPrimitiveType}}{{/isListContainer}}
-    },
-{{/vars}}
-}
+    export const $metaData: {{classname}}$ControlMetaData = {
+    {{#vars}}
+        {{name}}: {
+            {{^isListContainer}}{{#isPrimitiveType}}
+            {{#maxLength}}maxLength: {{maxLength}},{{/maxLength}}
+            {{^isEnum}}type: '{{datatype}}',{{/isEnum}}
+            {{/isPrimitiveType}}{{/isListContainer}}
+        },
+    {{/vars}}
+    };
 
-export const {{classname}} = {
-    $validators: $validators,
-    $controls: $controls,
-    $metaData: $metaData,
-    $buildForm: ((fb: FormBuilder, specificControls?: Optional<{{classname}}$Control>, additionalControls?: { [name: string]: (Control | FormGroup) }) => {
+    export function $buildForm(fb: FormBuilder, specificControls?: Optional<{{classname}}$Control>, additionalControls?: { [name: string]: (Control | FormGroup) }) {
         const defaultControls = {
 {{#vars}}
     {{^isListContainer}}
@@ -95,5 +92,5 @@ export const {{classname}} = {
 {{/vars}}
 
         return group;
-    })
+    }
 }
