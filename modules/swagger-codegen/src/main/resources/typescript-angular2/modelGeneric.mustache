@@ -46,29 +46,24 @@ export namespace {{classname}} {
     {{/vars}}
     };
 
-    export const $controls = {
-    {{#vars}}{{#isPrimitiveType}}
-        {{name}}: ((options?: IControlFactoryOptions<{{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}}>) => getControl($validators.{{name}}(), options)),
-    {{/isPrimitiveType}}{{/vars}}
+    export const $controls = { {{#vars}}{{^isListContainer}}{{^isMapContainer}}{{#isPrimitiveType}}
+        {{name}}: ((options?: IControlFactoryOptions<{{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}}>) => getControl($validators.{{name}}(), options)),{{/isPrimitiveType}}{{/isMapContainer}}{{/isListContainer}}{{/vars}}
     };
 
-    export const $metaData = {      
-    {{#vars}}
-        {{name}}: { {{^isListContainer}}{{^isMapContainer}}{{#isPrimitiveType}}{{#maxLength}}
+    export const $metaData = { {{#vars}}{{#isPrimitiveType}}
+        {{name}}: { {{#maxLength}}
             maxLength: {{maxLength}},{{/maxLength}}{{^isEnum}}
-            type: '{{datatype}}',{{/isEnum}}{{/isPrimitiveType}}{{/isMapContainer}}{{/isListContainer}}
-        },
-    {{/vars}}
+            type: '{{datatype}}',{{/isEnum}}
+        },{{/isPrimitiveType}}{{/vars}}
     };
 
     export function $buildForm(fb: FormBuilder, options?: IBuildFormOptions<{{classname}}>) {
-        const defaultControls = {
-{{#vars}}{{^isListContainer}}{{^isMapContainer}}
+        const defaultControls = { {{#vars}}{{^isListContainer}}{{^isMapContainer}}
             {{name}}: {{#isPrimitiveType}}$controls.{{name}}(getControlOptions(options, '{{name}}')){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},{{/isMapContainer}}{{/isListContainer}}{{/vars}}
         };
         const group = fb.group(adjustDefaultControls(defaultControls, options)!);
-{{#vars}}{{^isListContainer}}{{#isPrimitiveType}}
-        (<any>group.controls['{{name}}']).apaleoMetaData = $metaData.{{name}};{{/isPrimitiveType}}{{/isListContainer}}{{/vars}}
+{{#vars}}{{^isListContainer}}{{^isMapContainer}}{{#isPrimitiveType}}
+        (<any>group.controls['{{name}}']).apaleoMetaData = $metaData.{{name}};{{/isPrimitiveType}}{{/isMapContainer}}{{/isListContainer}}{{/vars}}
 
         return group;
     }
