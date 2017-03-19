@@ -1,7 +1,8 @@
-import { Validators, FormBuilder, ValidatorFn, FormGroup }          from '@angular/forms';
-import { ValidatorsFactory, ControlFactory, Control }               from '../../types';
-import { IApaleoAbstractControl, IApaleoControlMetaData, Optional } from '../../types';
-import { ResponseModel }                                            from '../../models';
+import { Validators, FormBuilder, ValidatorFn, FormGroup, AbstractControl } from '@angular/forms';
+import { IBuildFormOptions, IControlFactoryOptions, Control }               from '../../types';
+import { IApaleoAbstractControl, IApaleoControlMetaData, Optional }         from '../../types';
+import { ResponseModel }                                                    from '../../models';
+import { getControl, getControlOptions, adjustDefaultControls }             from '../../functions';
 
 export interface {{classname}} {{#parent}}extends models.{{{parent}}} {{/parent}}{
 {{#additionalPropertiesType}}
@@ -34,63 +35,43 @@ export namespace {{classname}} {
 
 export type {{classname}}WithRawHttp = {{classname}} & ResponseModel<{{classname}}>;
 
-export interface {{classname}}$Form<T> {
-{{#vars}}
-    {{name}}: T;
-{{/vars}}
-}
-
-export interface {{classname}}$ValidatorFactories extends {{classname}}$Form<ValidatorsFactory> {}
-export interface {{classname}}$ControlFactories extends {{classname}}$Form<ControlFactory> {}
-export interface {{classname}}$Control extends {{classname}}$Form<Control | FormGroup> {}
-export interface {{classname}}$ControlMetaData extends {{classname}}$Form<IApaleoControlMetaData> {}
-
 export namespace {{classname}} {
-    export const $validators: {{classname}}$ValidatorFactories = {
+    export const $validators = {
     {{#vars}}
-        {{name}}: (() => [
-            {{#required}}Validators.required,{{/required}}
-            {{#minLength}}Validators.minLength({{minLength}}),{{/minLength}}
-            {{#maxLength}}Validators.maxLength({{maxLength}}),{{/maxLength}}
+        {{name}}: (() => [{{#required}}
+            Validators.required,{{/required}}{{#minLength}}
+            Validators.minLength({{minLength}}),{{/minLength}}{{#maxLength}}
+            Validators.maxLength({{maxLength}}),{{/maxLength}}
         ]),
     {{/vars}}
     };
 
-    export const $controls: {{classname}}$ControlFactories = {
-    {{#vars}}
-        {{name}}: (() => [null, Validators.compose($validators.{{name}}())]),
-    {{/vars}}
+    export const $controls = {
+    {{#vars}}{{#isPrimitiveType}}
+        {{name}}: ((options?: IControlFactoryOptions<{{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}}>) => getControl($validators.{{name}}(), options)),
+    {{/isPrimitiveType}}{{/vars}}
     };
 
-    export const $metaData: {{classname}}$ControlMetaData = {
+    export const $metaData = {      
     {{#vars}}
-        {{name}}: {
-            {{^isListContainer}}{{#isPrimitiveType}}
-            {{#maxLength}}maxLength: {{maxLength}},{{/maxLength}}
-            {{^isEnum}}type: '{{datatype}}',{{/isEnum}}
-            {{/isPrimitiveType}}{{/isListContainer}}
+        {{name}}: { {{^isListContainer}}{{^isMapContainer}}{{#isPrimitiveType}}{{#maxLength}}
+            maxLength: {{maxLength}},{{/maxLength}}{{^isEnum}}
+            type: '{{datatype}}',{{/isEnum}}{{/isPrimitiveType}}{{/isMapContainer}}{{/isListContainer}}
         },
     {{/vars}}
     };
 
-    export function $buildForm(fb: FormBuilder, specificControls?: Optional<{{classname}}$Control>, additionalControls?: { [name: string]: (Control | FormGroup) }) {
+    export function $buildForm(fb: FormBuilder, options?: IBuildFormOptions<{{classname}}>) {
         const defaultControls = {
-{{#vars}}
-    {{^isListContainer}}
-            {{name}}: {{#isPrimitiveType}}$controls.{{name}}(){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},
-    {{/isListContainer}} 
-{{/vars}}
+{{#vars}}{{^isListContainer}}{{^isMapContainer}}
+            {{name}}: {{#isPrimitiveType}}$controls.{{name}}(getControlOptions(options, '{{name}}')){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},
+{{/isMapContainer}}{{/isListContainer}}{{/vars}}
         };
-
-        const group = fb.group(Object.assign(defaultControls, specificControls, additionalControls));
-
-{{#vars}}
-    {{^isListContainer}}{{#isPrimitiveType}}
+        const group = fb.group(adjustDefaultControls(defaultControls, options)!);
+{{#vars}}{{^isListContainer}}{{#isPrimitiveType}}
         const {{name}}Ctrl: IApaleoAbstractControl = <any>group.controls['{{name}}'];
         {{name}}Ctrl.apaleoMetaData = $metaData.{{name}};
-    {{/isPrimitiveType}}{{/isListContainer}}
-{{/vars}}
-
+{{/isPrimitiveType}}{{/isListContainer}}{{/vars}}
         return group;
     }
 }
