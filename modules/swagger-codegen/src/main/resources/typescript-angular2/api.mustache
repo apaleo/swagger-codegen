@@ -1,20 +1,15 @@
 {{>licenseInfo}}
-import { Inject, Injectable, Optional, LOCALE_ID }           from '@angular/core';
-import { Http, Headers, URLSearchParams }                    from '@angular/http';
-import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
-import { Response, ResponseContentType }                     from '@angular/http';
+import { Inject, Injectable, LOCALE_ID }                           from '@angular/core';
+import { Http, Headers, URLSearchParams, Response, RequestMethod } from '@angular/http';
 
-import { Observable }                                        from 'rxjs/Rx';
+import { Observable }                                              from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/delay';
-import 'rxjs/add/operator/catch';
 
-import * as models                                           from '../model/models';
-import { BASE_PATH, COLLECTION_FORMATS }                     from '../../variables';
-import { IRequestOptions, ResponseModel, ResponseHeaders }   from '../../models';
-import { Configuration }                                     from '../../configuration';
-import { callApiEndpoint }                                   from '../../functions';
+import * as models                                                 from '../model/models';
+import { BASE_PATH, COLLECTION_FORMATS }                           from '../../variables';
+import { IRequestOptions, ResponseModel }                          from '../../models';
+import { Configuration }                                           from '../../configuration';
+import { callApiEndpoint }                                         from '../../functions.api';
 
 /* tslint:disable:no-unused-variable member-ordering */
 

@@ -1,8 +1,7 @@
-import { Validators, FormBuilder, ValidatorFn, FormGroup, AbstractControl }  from '@angular/forms';
-import { IBuildFormOptions, IControlFactoryOptions, Control }                from '../../types';
-import { IApaleoAbstractControl, IApaleoControlMetaData }                    from '../../types';
-import { ResponseModel }                                                     from '../../models';
-import { getControl, getControlOptions, adjustDefaultControls, setMetaData } from '../../functions';
+import { FormBuilder, FormGroup }                         from '@angular/forms';
+import { IBuildFormOptions, IApaleoPropertyMetaData }     from '../../types';
+import { ResponseModel }                                  from '../../models';
+import { getControl, adjustDefaultControls, setMetaData } from '../../functions.model';
 
 export interface {{classname}} {{#parent}}extends models.{{{parent}}} {{/parent}}{
 {{#additionalPropertiesType}}
@@ -36,34 +35,25 @@ export namespace {{classname}} {
 export type {{classname}}WithRawHttp = {{classname}} & ResponseModel<{{classname}}>;
 
 export namespace {{classname}} {
-    export const $validators = {
-    {{#vars}}
-        {{name}}: (() => [{{#required}}
-            Validators.required,{{/required}}{{#minLength}}
-            Validators.minLength({{minLength}}),{{/minLength}}{{#maxLength}}
-            Validators.maxLength({{maxLength}}),{{/maxLength}}
-        ]),
-    {{/vars}}
+    export const $metaData = { {{#vars}}
+        {{name}}: Object.freeze({ {{#required}}
+            isRequired: true,{{/required}}{{#minLength}}
+            minLength: {{minLength}},{{/minLength}}{{#maxLength}}
+            maxLength: {{maxLength}},{{/maxLength}}
+            type: '{{{datatype}}}',{{#isEnum}}
+            isEnum: true,{{/isEnum}}{{#isPrimitiveType}}
+            isPrimitiveType: true,{{/isPrimitiveType}}{{#isListContainer}}
+            isListContainer: true,{{/isListContainer}}{{#isMapContainer}}
+            isMapContainer: true,{{/isMapContainer}}
+        } as IApaleoPropertyMetaData),{{/vars}}
     };
 
-    export const $controls = { {{#vars}}{{^isListContainer}}{{^isMapContainer}}{{#isPrimitiveType}}
-        {{name}}: ((options?: IControlFactoryOptions<{{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}}>) => getControl($validators.{{name}}(), options)),{{/isPrimitiveType}}{{/isMapContainer}}{{/isListContainer}}{{/vars}}
-    };
-
-    export const $metaData = { {{#vars}}{{#isPrimitiveType}}
-        {{name}}: { {{#maxLength}}
-            maxLength: {{maxLength}},{{/maxLength}}{{^isEnum}}
-            type: '{{datatype}}',{{/isEnum}}
-        } as IApaleoControlMetaData,{{/isPrimitiveType}}{{/vars}}
-    };
-
-    export function $buildForm(fb: FormBuilder, options?: IBuildFormOptions<{{classname}}>) {
+    export function $buildForm(fb: FormBuilder, options?: IBuildFormOptions<{{classname}}>): FormGroup {
         const defaultControls = { {{#vars}}{{^isListContainer}}{{^isMapContainer}}
-            {{name}}: {{#isPrimitiveType}}$controls.{{name}}(getControlOptions(options, '{{name}}')){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},{{/isMapContainer}}{{/isListContainer}}{{/vars}}
+            {{name}}: {{#isPrimitiveType}}getControl($metaData.{{name}}, options, '{{name}}'){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},{{/isMapContainer}}{{/isListContainer}}{{/vars}}
         };
-        const group = fb.group(adjustDefaultControls(defaultControls, options)!);
-{{#vars}}{{^isListContainer}}{{^isMapContainer}}{{#isPrimitiveType}}
-        setMetaData(<any>group.controls.{{name}}, $metaData.{{name}});{{/isPrimitiveType}}{{/isMapContainer}}{{/isListContainer}}{{/vars}}
+        const group = fb.group(adjustDefaultControls(defaultControls, options));
+        setMetaData(group, $metaData);
 
         return group;
     }
