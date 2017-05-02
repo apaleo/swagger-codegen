@@ -215,7 +215,8 @@ export class {{classname}} {
 {{#hasFormParams}}
                 body: formParams.toString(),
 {{/hasFormParams}}
-                search: queryParameters
+                search: queryParameters,
+                withCredentials: this.configuration.withCredentials
             },
             Object.assign({}, this.configuration, $options),
             retryTimesToGo => {
