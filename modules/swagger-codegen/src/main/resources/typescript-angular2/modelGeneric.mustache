@@ -53,7 +53,7 @@ export namespace {{classname}} {
             {{name}}: {{#isPrimitiveType}}getControl($metaData.{{name}}, options, '{{name}}'){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},{{/isMapContainer}}{{/isListContainer}}{{/vars}}
         };
         const group = fb.group(adjustDefaultControls(defaultControls, options));
-        setMetaData(group, $metaData);
+        prepareFormGroup(group, $metaData, options);
 
         return group;
     }
