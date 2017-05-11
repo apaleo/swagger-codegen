@@ -15,6 +15,18 @@ import { callApiEndpoint }                                         from '../../f
 
 {{#operations}}
 
+{{#operation}}
+{{#allParams.0}}export interface {{nickname}}Params {
+{{#allParams}}
+    /**
+     * {{{description}}}
+     */
+    {{paramName}}{{^required}}?{{/required}}: {{{dataType}}};
+{{/allParams}}  
+}
+{{/allParams.0}}
+{{/operation}}
+
 {{#description}}
 /**
  * {{&description}}
@@ -39,9 +51,9 @@ export class {{classname}} {
      * {{notes}}
      {{#allParams}}* @param {{paramName}} {{description}}
      {{/allParams}}*/
-    public {{nickname}}({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}, {{/allParams}}$options?: IRequestOptions)
+    public {{nickname}}({{#allParams.0}}params: {{nickname}}Params, {{/allParams.0}}$options?: IRequestOptions)
         : Observable<{{#returnType}}{{{returnType}}} | undefined{{/returnType}}{{^returnType}}void{{/returnType}}> {
-        return this.{{nickname}}WithRawHttp({{#allParams}}{{paramName}}, {{/allParams}}$options)
+        return this.{{nickname}}WithRawHttp({{#allParams.0}}params, {{/allParams.0}}$options)
             .map(response => response.$hasValue(response) ? response : undefined);
     }
 
@@ -53,9 +65,9 @@ export class {{classname}} {
      * {{notes}}
      {{#allParams}}* @param {{paramName}} {{description}}
      {{/allParams}}*/
-    public {{nickname}}WithRawHttp({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}, {{/allParams}}$options?: IRequestOptions)
+    public {{nickname}}WithRawHttp({{#allParams.0}}params: {{nickname}}Params, {{/allParams.0}}$options?: IRequestOptions)
         : Observable<ResponseModel<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}}>> {
-        return this.{{nickname}}WithHttpInfo({{#allParams}}{{paramName}}, {{/allParams}}$options)
+        return this.{{nickname}}WithHttpInfo({{#allParams.0}}params, {{/allParams.0}}$options)
             .map((response: Response) => new ResponseModel(response));
     }
 
@@ -67,9 +79,10 @@ export class {{classname}} {
      * {{notes}}
      {{#allParams}}* @param {{paramName}} {{description}}
      {{/allParams}}*/
-    private {{nickname}}WithHttpInfo({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}, {{/allParams}}$options?: IRequestOptions): Observable<Response> {
+    private {{nickname}}WithHttpInfo({{#allParams.0}}params: {{nickname}}Params, {{/allParams.0}}$options?: IRequestOptions): Observable<Response> {
+        params = params || {};
         const path = this.basePath + '{{path}}'{{#pathParams}}
-                    .replace('${' + '{{baseName}}' + '}', String({{paramName}})){{/pathParams}};
+                    .replace('${' + '{{baseName}}' + '}', String(params.{{paramName}})){{/pathParams}};
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
@@ -80,35 +93,35 @@ export class {{classname}} {
 {{#allParams}}
 {{#required}}
         // verify required parameter '{{paramName}}' is not null or undefined
-        if ({{paramName}} === null || {{paramName}} === undefined) {
+        if (params.{{paramName}} === null || params.{{paramName}} === undefined) {
             throw new Error('Required parameter {{paramName}} was null or undefined when calling {{nickname}}.');
         }
 {{/required}}
 {{/allParams}}
 {{#queryParams}}
         {{#isListContainer}}
-        if ({{paramName}}) {
+        if (params.{{paramName}}) {
         {{#isCollectionFormatMulti}}
-            {{paramName}}.forEach((element) => {
+            params.{{paramName}}.forEach((element) => {
                 queryParameters.append('{{baseName}}', <any>element);
             })
         {{/isCollectionFormatMulti}}
         {{^isCollectionFormatMulti}}
-            queryParameters.set('{{baseName}}', {{paramName}}.join(COLLECTION_FORMATS['{{collectionFormat}}']));
+            queryParameters.set('{{baseName}}', params.{{paramName}}.join(COLLECTION_FORMATS['{{collectionFormat}}']));
         {{/isCollectionFormatMulti}}
         }
         {{/isListContainer}}
         {{^isListContainer}}
-        if ({{paramName}} !== undefined) {
+        if (params.{{paramName}} !== undefined) {
         {{#isDateTime}}
-            queryParameters.set('{{baseName}}', <any>{{paramName}}.toISOString());
+            queryParameters.set('{{baseName}}', <any>params.{{paramName}}.toISOString());
         {{/isDateTime}}
         {{^isDateTime}}
             {{#isDate}}
-            queryParameters.set('{{baseName}}', <any>{{paramName}}.toISOString());
+            queryParameters.set('{{baseName}}', <any>params.{{paramName}}.toISOString());
             {{/isDate}}
             {{^isDate}}
-            queryParameters.set('{{baseName}}', <any>{{paramName}});
+            queryParameters.set('{{baseName}}', <any>params.{{paramName}});
             {{/isDate}}
         {{/isDateTime}}
         }
@@ -117,12 +130,12 @@ export class {{classname}} {
 {{/queryParams}}
 {{#headerParams}}
         {{#isListContainer}}
-        if ({{paramName}}) {
-            headers.set('{{baseName}}', {{paramName}}.join(COLLECTION_FORMATS['{{collectionFormat}}']));
+        if (params.{{paramName}}) {
+            headers.set('{{baseName}}', params.{{paramName}}.join(COLLECTION_FORMATS['{{collectionFormat}}']));
         }
         {{/isListContainer}}
         {{^isListContainer}}
-        headers.set('{{baseName}}', String({{paramName}}));
+        headers.set('{{baseName}}', String(params.{{paramName}}));
         {{/isListContainer}}
 
 {{/headerParams}}
@@ -184,20 +197,20 @@ export class {{classname}} {
 {{/bodyParam}}
 {{#formParams}}
         {{#isListContainer}}
-        if ({{paramName}}) {
+        if (params.{{paramName}}) {
         {{#isCollectionFormatMulti}}
-            {{paramName}}.forEach((element) => {
+            params.{{paramName}}.forEach((element) => {
                 formParams.append('{{baseName}}', <any>element);
             })
         {{/isCollectionFormatMulti}}
         {{^isCollectionFormatMulti}}
-            formParams.set('{{baseName}}', {{paramName}}.join(COLLECTION_FORMATS['{{collectionFormat}}']));
+            formParams.set('{{baseName}}', params.{{paramName}}.join(COLLECTION_FORMATS['{{collectionFormat}}']));
         {{/isCollectionFormatMulti}}
         }
         {{/isListContainer}}
         {{^isListContainer}}
-        if ({{paramName}} !== undefined) {
-            formParams.set('{{baseName}}', <any>{{paramName}});
+        if (params.{{paramName}} !== undefined) {
+            formParams.set('{{baseName}}', <any>params.{{paramName}});
         }
         {{/isListContainer}}
 
@@ -210,7 +223,7 @@ export class {{classname}} {
                 method: {{httpMethod}},
                 headers: headers,
 {{#bodyParam}}
-                body: {{paramName}} == null ? '' : JSON.stringify({{paramName}}), // https://github.com/angular/angular/issues/10612
+                body: params.{{paramName}} == null ? '' : JSON.stringify(params.{{paramName}}), // https://github.com/angular/angular/issues/10612
 {{/bodyParam}}
 {{#hasFormParams}}
                 body: formParams.toString(),
@@ -223,7 +236,7 @@ export class {{classname}} {
                 $options = $options || {};
                 $options.retryTimes = retryTimesToGo;
 
-                return this.{{nickname}}WithHttpInfo({{#allParams}}{{paramName}}, {{/allParams}}$options);
+                return this.{{nickname}}WithHttpInfo({{#allParams.0}}params, {{/allParams.0}}$options);
             }
         )
     }
