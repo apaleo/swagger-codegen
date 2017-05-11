@@ -80,7 +80,7 @@ export class {{classname}} {
      {{#allParams}}* @param {{paramName}} {{description}}
      {{/allParams}}*/
     private {{nickname}}WithHttpInfo({{#allParams.0}}params: {{nickname}}Params, {{/allParams.0}}$options?: IRequestOptions): Observable<Response> {
-        params = params || {};
+{{#allParams.0}}        params = params || {};{{/allParams.0}}
         const path = this.basePath + '{{path}}'{{#pathParams}}
                     .replace('${' + '{{baseName}}' + '}', String(params.{{paramName}})){{/pathParams}};
 
