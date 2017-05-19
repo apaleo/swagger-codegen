@@ -114,11 +114,11 @@ export class {{classname}} {
         {{^isListContainer}}
         if (params.{{paramName}} !== undefined) {
         {{#isDateTime}}
-            queryParameters.set('{{baseName}}', <any>params.{{paramName}}.toISOString());
+            queryParameters.set('{{baseName}}', <any>params.{{paramName}}.toApaleoIso());
         {{/isDateTime}}
         {{^isDateTime}}
             {{#isDate}}
-            queryParameters.set('{{baseName}}', <any>params.{{paramName}}.toISOString());
+            queryParameters.set('{{baseName}}', <any>params.{{paramName}}.toApaleoDatesIso());
             {{/isDate}}
             {{^isDate}}
             queryParameters.set('{{baseName}}', <any>params.{{paramName}});
