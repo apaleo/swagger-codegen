@@ -1,11 +1,7 @@
-import { FormBuilder, FormGroup }                              from '@angular/forms';
-import { ResponseModel }                                       from '../../models';
-import { getControl, adjustDefaultControls, prepareFormGroup } from '../../functions.model';
-import { 
-    BuildFormOptions,
-    ApaleoPropertyMetaData,
-    ApaleoEnumPropertyMetaData,
-    ApaleoEnum } from '../../types';
+import { FormBuilder, FormGroup }                                               from '@angular/forms';
+import { ResponseModel }                                                        from '../../models';
+import { getControl, adjustDefaultControls, prepareFormGroup }                  from '../../functions.model';
+import { BuildFormOptions, ApaleoPropertyMetaData, ApaleoEnumPropertyMetaData } from '../../types';
 
 export interface {{classname}} {{#parent}}extends models.{{{parent}}} {{/parent}}{
 {{#additionalPropertiesType}}
@@ -25,15 +21,10 @@ export interface {{classname}} {{#parent}}extends models.{{{parent}}} {{/parent}
 export namespace {{classname}} {
 {{#vars}}
     {{#isEnum}}
-    export type {{enumName}} = {{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}} | {{/-last}}{{/enumVars}}{{/allowableValues}}
+    export type {{enumName}} = {{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}} | {{/-last}}{{/enumVars}}{{/allowableValues}};
 
-    export const {{enumName}}Values: ApaleoEnum<{{enumName}}> = Object.freeze(
-    [{{#allowableValues}}{{#enumVars}}
-        {
-            description: '{{{name}}}',
-            value: {{{value}}} as {{enumName}}
-        }{{^-last}}, {{/-last}}
-    {{/enumVars}}{{/allowableValues}}])
+    export const {{enumName}}Values = Object.freeze(
+        [{{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}}] as {{enumName}}[]);
     {{/isEnum}}
 {{/vars}}
 }{{/hasEnums}}
