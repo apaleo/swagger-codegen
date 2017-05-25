@@ -31,7 +31,7 @@ export namespace {{classname}} {
     [{{#allowableValues}}{{#enumVars}}
         {
             description: '{{{name}}}',
-            value: {{{value}}}
+            value: {{{value}}} as {{enumName}}
         }{{^-last}}, {{/-last}}
     {{/enumVars}}{{/allowableValues}}])
     {{/isEnum}}
