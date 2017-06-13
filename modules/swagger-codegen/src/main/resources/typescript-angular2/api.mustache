@@ -21,7 +21,7 @@ import { callApiEndpoint }                                         from '../../f
     /**
      * {{{description}}}
      */
-    {{paramName}}{{^required}}?{{/required}}: {{{dataType}}};
+    {{paramName}}{{^required}}?{{/required}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}};
 {{/allParams}}  
 }
 {{/allParams.0}}
