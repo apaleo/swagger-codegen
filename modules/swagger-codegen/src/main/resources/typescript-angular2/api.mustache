@@ -22,12 +22,11 @@ import { callApiEndpoint }                                         from '../../f
      * {{{description}}}
      */
     {{paramName}}{{^required}}?{{/required}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}};
-    {{paramName}}{{^required}}?{{/required}}: {{{dataType}}};
 {{/allParams}}  
 }
 {{#allParams}}{{#isEnum}}
 export namespace {{nickname}}Params {
-    export enum {{datatypeWithEnum}}Set {
+    export enum {{enumName}}Set {
     {{#allowableValues}}
         {{#enumVars}}
         {{{name}}} = {{{value}}}{{^-last}},{{/-last}}
@@ -35,9 +34,9 @@ export namespace {{nickname}}Params {
     {{/allowableValues}}
     }
 
-    export type {{datatypeWithEnum}} = {{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}} | {{/-last}}{{/enumVars}}{{/allowableValues}};
+    export type {{enumName}} = {{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}} | {{/-last}}{{/enumVars}}{{/allowableValues}};
 
-    export const {{datatypeWithEnum}}Values = Object.freeze(
+    export const {{enumName}}Values = Object.freeze(
         [{{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}}] as {{datatypeWithEnum}}[]);
 }
 {{/isEnum}}{{/allParams}}
