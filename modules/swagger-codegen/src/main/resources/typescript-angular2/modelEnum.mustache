@@ -3,10 +3,20 @@
     * {{{description}}}
     */
 {{/description}}
-export enum {{classname}} {
+export enum {{classname}}Set {
 {{#allowableValues}}
 {{#enumVars}}
-    {{{name}}} = <any> {{{value}}}{{^-last}},{{/-last}}
+    {{{name}}} = {{{value}}}{{^-last}},{{/-last}}
 {{/enumVars}}
 {{/allowableValues}}
 }
+
+{{#description}}
+    /**
+    * {{{description}}}
+    */
+{{/description}}
+export type {{classname}} = {{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}} | {{/-last}}{{/enumVars}}{{/allowableValues}};
+
+export const {{classname}}Values = Object.freeze(
+    [{{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}}] as {{classname}}[]);

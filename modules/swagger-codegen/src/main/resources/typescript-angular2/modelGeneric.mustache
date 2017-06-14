@@ -21,6 +21,14 @@ export interface {{classname}} {{#parent}}extends models.{{{parent}}} {{/parent}
 export namespace {{classname}} {
 {{#vars}}
     {{#isEnum}}
+    export enum {{enumName}}Set {
+    {{#allowableValues}}
+        {{#enumVars}}
+        {{{name}}} = {{{value}}}{{^-last}},{{/-last}}
+        {{/enumVars}}
+    {{/allowableValues}}
+    }
+
     export type {{enumName}} = {{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}} | {{/-last}}{{/enumVars}}{{/allowableValues}};
 
     export const {{enumName}}Values = Object.freeze(
