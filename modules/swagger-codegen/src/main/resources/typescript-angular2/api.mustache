@@ -16,16 +16,16 @@ import { callApiEndpoint }                                         from '../../f
 {{#operations}}
 
 {{#operation}}
-{{#allParams.0}}export interface {{nickname}}Params {
-{{#allParams}}
-    /**
-     * {{{description}}}
-     */
-    {{paramName}}{{^required}}?{{/required}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}};
-{{/allParams}}  
-}
-{{#allParams}}{{#isEnum}}
-export namespace {{nickname}}Params {
+{{#allParams.0}}export namespace {{nickname}} {
+    export interface Params {
+    {{#allParams}}
+        /**
+        * {{{description}}}
+        */
+        {{paramName}}{{^required}}?{{/required}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}};
+    {{/allParams}}  
+    }
+    {{#allParams}}{{#isEnum}}
     export enum {{enumName}}Set {
     {{#allowableValues}}
         {{#enumVars}}
@@ -37,9 +37,9 @@ export namespace {{nickname}}Params {
     export type {{enumName}} = {{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}} | {{/-last}}{{/enumVars}}{{/allowableValues}};
 
     export const {{enumName}}Values = Object.freeze(
-        [{{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}}] as {{datatypeWithEnum}}[]);
+        [{{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}}] as {{enumName}}[]);
+    {{/isEnum}}{{/allParams}}
 }
-{{/isEnum}}{{/allParams}}
 {{/allParams.0}}
 {{/operation}}
 
@@ -67,7 +67,7 @@ export class {{classname}} {
      * {{notes}}
      {{#allParams}}* @param {{paramName}} {{description}}
      {{/allParams}}*/
-    public {{nickname}}({{#allParams.0}}params: {{nickname}}Params, {{/allParams.0}}$options?: ApaleoRequestOptions)
+    public {{nickname}}({{#allParams.0}}params: {{nickname}}.Params, {{/allParams.0}}$options?: ApaleoRequestOptions)
         : Observable<{{#returnType}}{{{returnType}}} | undefined{{/returnType}}{{^returnType}}void{{/returnType}}> {
         return this.{{nickname}}WithRawHttp({{#allParams.0}}params, {{/allParams.0}}$options)
             .map(response => response.$hasValue(response) ? response : undefined);
@@ -81,7 +81,7 @@ export class {{classname}} {
      * {{notes}}
      {{#allParams}}* @param {{paramName}} {{description}}
      {{/allParams}}*/
-    public {{nickname}}WithRawHttp({{#allParams.0}}params: {{nickname}}Params, {{/allParams.0}}$options?: ApaleoRequestOptions)
+    public {{nickname}}WithRawHttp({{#allParams.0}}params: {{nickname}}.Params, {{/allParams.0}}$options?: ApaleoRequestOptions)
         : Observable<ResponseModel<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}}>> {
         return this.{{nickname}}WithHttpInfo({{#allParams.0}}params, {{/allParams.0}}$options)
             .map((response: Response) => new ResponseModel(response));
@@ -95,7 +95,7 @@ export class {{classname}} {
      * {{notes}}
      {{#allParams}}* @param {{paramName}} {{description}}
      {{/allParams}}*/
-    private {{nickname}}WithHttpInfo({{#allParams.0}}params: {{nickname}}Params, {{/allParams.0}}$options?: ApaleoRequestOptions): Observable<Response> {
+    private {{nickname}}WithHttpInfo({{#allParams.0}}params: {{nickname}}.Params, {{/allParams.0}}$options?: ApaleoRequestOptions): Observable<Response> {
 {{#allParams.0}}        params = params || {};{{/allParams.0}}
         const path = this.basePath + '{{path}}'{{#pathParams}}
                     .replace('${' + '{{baseName}}' + '}', String(params.{{paramName}})){{/pathParams}};
