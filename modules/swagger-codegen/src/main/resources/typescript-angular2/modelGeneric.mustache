@@ -1,7 +1,7 @@
-import { FormBuilder, FormGroup }                              from '@angular/forms';
-import { IBuildFormOptions, IApaleoPropertyMetaData }          from '../../types';
-import { ResponseModel }                                       from '../../models';
-import { getControl, adjustDefaultControls, prepareFormGroup } from '../../functions.model';
+import { FormBuilder, FormGroup }                                               from '@angular/forms';
+import { ResponseModel }                                                        from '../../models';
+import { getControl, adjustDefaultControls, prepareFormGroup }                  from '../../functions.model';
+import { BuildFormOptions, ApaleoPropertyMetaData, ApaleoEnumPropertyMetaData } from '../../types';
 
 export interface {{classname}} {{#parent}}extends models.{{{parent}}} {{/parent}}{
 {{#additionalPropertiesType}}
@@ -21,13 +21,18 @@ export interface {{classname}} {{#parent}}extends models.{{{parent}}} {{/parent}
 export namespace {{classname}} {
 {{#vars}}
     {{#isEnum}}
-    export enum {{enumName}} {
+    export enum {{enumName}}Set {
     {{#allowableValues}}
         {{#enumVars}}
-        {{{name}}} = <any> {{{value}}}{{^-last}},{{/-last}}
+        {{{name}}} = {{{value}}}{{^-last}},{{/-last}}
         {{/enumVars}}
     {{/allowableValues}}
     }
+
+    export type {{enumName}} = {{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}} | {{/-last}}{{/enumVars}}{{/allowableValues}};
+
+    export const {{enumName}}Values = Object.freeze(
+        [{{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}}] as {{enumName}}[]);
     {{/isEnum}}
 {{/vars}}
 }{{/hasEnums}}
@@ -41,14 +46,15 @@ export namespace {{classname}} {
             minLength: {{minLength}},{{/minLength}}{{#maxLength}}
             maxLength: {{maxLength}},{{/maxLength}}
             type: '{{{datatype}}}',{{#isEnum}}
-            isEnum: true,{{/isEnum}}{{#isPrimitiveType}}
+            isEnum: true,
+            allowedEnumValues: {{enumName}}Values,{{/isEnum}}{{#isPrimitiveType}}
             isPrimitiveType: true,{{/isPrimitiveType}}{{#isListContainer}}
             isListContainer: true,{{/isListContainer}}{{#isMapContainer}}
             isMapContainer: true,{{/isMapContainer}}
-        } as IApaleoPropertyMetaData),{{/vars}}
+        } as {{^isEnum}}ApaleoPropertyMetaData{{/isEnum}}{{#isEnum}}ApaleoEnumPropertyMetaData<{{enumName}}>{{/isEnum}}),{{/vars}}
     };
 
-    export function $buildForm(fb: FormBuilder, options?: IBuildFormOptions<{{classname}}>): FormGroup {
+    export function $buildForm(fb: FormBuilder, options?: BuildFormOptions<{{classname}}>): FormGroup {
         const defaultControls = { {{#vars}}{{^isListContainer}}{{^isMapContainer}}
             {{name}}: {{#isPrimitiveType}}getControl($metaData.{{name}}, options, '{{name}}'){{/isPrimitiveType}}{{^isPrimitiveType}}{{datatype}}.$buildForm(fb){{/isPrimitiveType}},{{/isMapContainer}}{{/isListContainer}}{{/vars}}
         };
