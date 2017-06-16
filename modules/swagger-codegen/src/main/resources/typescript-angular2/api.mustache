@@ -59,9 +59,7 @@ export class {{classname}} implements {{classname}}Interface {
 {{^withInterfaces}}
 export class {{classname}} {
 {{/withInterfaces}}
-
-    protected basePath = '{{{basePath}}}';
-    public defaultHeaders: Headers = new Headers();
+    public readonly defaultHeaders: Headers = new Headers();
 
     constructor(
         protected readonly http: Http, 
