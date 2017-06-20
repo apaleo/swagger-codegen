@@ -1,9 +1,56 @@
 {{#apiInfo}}
+import { NgModule, Provider, Optional, SkipSelf, LOCALE_ID } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpModule, Http } from '@angular/http';
+
 {{#apis}}
 {{#operations}}
 export * from './{{ classFilename }}';
 import { {{ classname }} } from './{{ classFilename }}';
+
 {{/operations}}
 {{/apis}}
-export const APIS = [{{#apis}}{{#operations}}{{ classname }}{{/operations}}{{^-last}}, {{/-last}}{{/apis}}];
+import { Configuration } from '../../configuration';
+import { BASE_PATH } from '../../variables';
+import { ApiModule } from '../../types';
+
+export const APIS = [
+    {{#apis}}{{#operations}}{{ classname }}{{/operations}}{{^-last}}, {{/-last}}{{/apis}}
+];
+
+{{#apis}}
+{{#operations}}
+export function {{ classFilename }}Factory(http: Http, config: Configuration, locale: string, basePath: string, parent?: {{ classFilename }}) {
+    return parent || new {{ classFilename }}(http, config, locale, basePath);
+}
+
+export const {{ classFilename }}Provider: Provider = {
+    provide: {{ classFilename }},
+    deps: [
+        Http,
+        Configuration,
+        LOCALE_ID,
+        BASE_PATH,
+        [new Optional(), new SkipSelf(), {{ classFilename }}]
+    ],
+    useFactory: {{ classFilename }}Factory
+}
+
+{{/operations}}
+{{/apis}}
+export const API_PROVIDERS: Provider[] = [
+    {{#apis}}{{#operations}}{{ classname }}Provider{{/operations}}{{^-last}}, {{/-last}}{{/apis}}
+];
+
+@NgModule({
+    imports: [
+        CommonModule,
+        HttpModule
+    ],
+    providers: [
+        ...API_PROVIDERS
+    ]
+})
+export class Module implements ApiModule {}
+
 {{/apiInfo}}
