@@ -176,7 +176,7 @@ export class {{classname}} {
         {{^isListContainer}}
         if (params.{{paramName}} !== undefined) {
         {{#isDateTime}}
-            queryParameters.set('{{baseName}}', dateToApaleoDateIso(params.{{paramName}}));
+            queryParameters.set('{{baseName}}', dateToApaleoIso(params.{{paramName}}));
         {{/isDateTime}}
         {{^isDateTime}}
             queryParameters.set('{{baseName}}', <any>params.{{paramName}});
