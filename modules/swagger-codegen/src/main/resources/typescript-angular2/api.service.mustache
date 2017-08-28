@@ -2,7 +2,9 @@
 /* tslint:disable:no-unused-variable member-ordering */
 
 import { Inject, Injectable, Optional, LOCALE_ID }           from '@angular/core';
-import { Http, Headers, URLSearchParams, ResponseContentType } from '@angular/http';
+import { Http, Headers, URLSearchParams }                    from '@angular/http';
+import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http';
+import { Response, ResponseContentType }                     from '@angular/http';
 
 import { Observable }                                        from 'rxjs/Observable';
 import '../rxjs-operators';
