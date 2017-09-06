@@ -30,7 +30,7 @@ import { {{classname}}Interface }                            from './{{classname
         /**
         * {{{description}}}
         */
-        {{paramName}}{{^required}}?{{/required}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}};
+        readonly {{paramName}}{{^required}}?{{/required}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}};
     {{/allParams}}  
     }
     {{#allParams}}{{#isEnum}}

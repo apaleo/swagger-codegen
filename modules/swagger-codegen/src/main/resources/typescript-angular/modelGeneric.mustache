@@ -11,7 +11,7 @@ import {
 
 export interface {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{
 {{#additionalPropertiesType}}
-    [key: string]: {{{additionalPropertiesType}}}{{#hasVars}} | any{{/hasVars}};
+    readonly [key: string]: {{{additionalPropertiesType}}}{{#hasVars}} | any{{/hasVars}};
 
 {{/additionalPropertiesType}}
 {{#vars}}
@@ -20,7 +20,7 @@ export interface {{classname}} {{#parent}}extends {{{parent}}} {{/parent}}{
      * {{{description}}}
      */
     {{/description}}
-    {{name}}{{^required}}?{{/required}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}};
+    readonly {{name}}{{^required}}?{{/required}}: {{#isEnum}}{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}};
 
 {{/vars}}
 }{{#hasEnums}}
@@ -38,7 +38,7 @@ export namespace {{classname}} {
 export type {{classname}}WithRawHttp = {{classname}} & ResponseModel<{{classname}}>;
 
 export namespace {{classname}} {
-    export const $metaData = { {{#vars}}
+    export const $metaData = Object.freeze({ {{#vars}}
         {{name}}: Object.freeze({ {{#required}}
             isRequired: true,{{/required}}{{#minLength}}
             minLength: {{minLength}},{{/minLength}}{{#maxLength}}
@@ -50,7 +50,7 @@ export namespace {{classname}} {
             isListContainer: true,{{/isListContainer}}{{#isMapContainer}}
             isMapContainer: true,{{/isMapContainer}}
         } as {{^isEnum}}ApaleoPropertyMetaData{{/isEnum}}{{#isEnum}}ApaleoEnumPropertyMetaData<{{enumName}}>{{/isEnum}}),{{/vars}}
-    };
+    });
 
     export function $buildForm(fb: FormBuilder, options?: BuildFormOptions<{{classname}}>): FormGroup {
         const defaultControls = { {{#vars}}{{^isListContainer}}{{^isMapContainer}}
