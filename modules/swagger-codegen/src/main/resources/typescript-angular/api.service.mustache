@@ -19,7 +19,7 @@ import { Observable }                                        from 'rxjs/Observab
 import '../rxjs-operators';
 {{/useHttpClient}}
 
-import { dateToApaleoIso }                                   from '@apaleo/angular-api-proxy-common';
+import { dateToApaleoDateIso, dateToApaleoIso }              from '@apaleo/angular-api-proxy-common';
 
 {{#imports}}
 import { {{classname}} } from '../{{filename}}';
@@ -177,7 +177,12 @@ export class {{classname}} {
             {{#useHttpClient}}queryParameters = {{/useHttpClient}}queryParameters.set('{{baseName}}', <any>dateToApaleoIso({{paramName}}));
         {{/isDateTime}}
         {{^isDateTime}}
+        {{#isDate}}
+            {{#useHttpClient}}queryParameters = {{/useHttpClient}}queryParameters.set('{{baseName}}', <any>dateToApaleoDateIso({{paramName}}));
+        {{/isDate}}
+        {{^isDate}}
             {{#useHttpClient}}queryParameters = {{/useHttpClient}}queryParameters.set('{{baseName}}', <any>{{paramName}});
+        {{/isDate}}
         {{/isDateTime}}
         }
         {{/isListContainer}}
