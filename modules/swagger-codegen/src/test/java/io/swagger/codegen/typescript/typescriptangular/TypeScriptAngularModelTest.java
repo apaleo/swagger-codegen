@@ -76,7 +76,7 @@ public class TypeScriptAngularModelTest {
         Assert.assertEquals(property4.complexType, null);
         Assert.assertEquals(property4.datatype, "Date");
         Assert.assertEquals(property4.name, "birthDate");
-        Assert.assertEquals(property4.baseType, "string");
+        Assert.assertEquals(property4.baseType, "Date");
         Assert.assertEquals(property4.defaultValue, "undefined");
         Assert.assertFalse(property4.hasMore);
         Assert.assertFalse(property4.required);
