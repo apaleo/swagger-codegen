@@ -30,6 +30,7 @@ public class TypeScriptNodeClientCodegen extends AbstractTypeScriptClientCodegen
         super();
 
         typeMapping.put("file", "Buffer");
+        typeMapping.put("date", "string");
 
         // clear import mapping (from default generator) as TS does not use it
         // at the moment
