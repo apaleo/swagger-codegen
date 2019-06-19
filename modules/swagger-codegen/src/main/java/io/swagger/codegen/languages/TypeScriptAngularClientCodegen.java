@@ -280,6 +280,11 @@ public class TypeScriptAngularClientCodegen extends AbstractTypeScriptClientCode
                 }
             }
 
+            boolean responseCanBeNull = (boolean) additionalProperties.get("useHttpClient") && op.responses.anyMatch(r -> r.code.equals("204"));
+            if (!op.returnType.contains("|null")) {
+                op.returnType += "|null";
+            }
+
             // Prep a string buffer where we're going to set up our new version of the string.
             StringBuilder pathBuffer = new StringBuilder();
             StringBuilder parameterName = new StringBuilder();
