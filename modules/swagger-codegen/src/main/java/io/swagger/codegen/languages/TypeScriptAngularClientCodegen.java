@@ -280,7 +280,7 @@ public class TypeScriptAngularClientCodegen extends AbstractTypeScriptClientCode
                 }
             }
 
-            //If httpClient is used and 204 possible, then we can get null. In this case we declare it for proxy return type.
+            // If httpClient is used and 204 possible, then null might be returned. In this case we declare it for proxy return type.
             boolean responseCanBeNull = (boolean) additionalProperties.get("useHttpClient") && op.responses.anyMatch(r -> r.code.equals("204"));
             if (responseCanBeNull && !op.returnType.contains("|null")) {
                 op.returnType += "|null";
