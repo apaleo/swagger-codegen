@@ -1,4 +1,7 @@
-FROM openjdk:8-jdk-alpine
+FROM maven:3-jdk-8-alpine
+
+RUN set -x && \
+    apk add --no-cache bash
 
 ENV GEN_DIR /opt/swagger-codegen
 ENV MAVEN_HOME=/usr/share/maven
